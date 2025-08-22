@@ -28,16 +28,16 @@ companion-chat-app/
 ## Phase 0: Development Environment Setup
 
 ### Step 0.1: Install Flutter SDK
-- [ ] Follow official Flutter installation guide for Windows
-- [ ] Download Flutter SDK and add to PATH
-- [ ] Install required tools: Git, Android Studio, VS Code with Flutter extension
-- [ ] Run `flutter doctor` to verify installation
+- [x] Follow official Flutter installation guide for Windows
+- [x] Download Flutter SDK and add to PATH
+- [x] Install required tools: Git, Android Studio, VS Code with Flutter extension
+- [x] Run `flutter doctor` to verify installation
 
 ### Step 0.2: Set Up Android Development
-- [ ] Install Android Studio
-- [ ] Install Android SDK and create virtual device (AVD)
-- [ ] Accept Android licenses with `flutter doctor --android-licenses`
-- [ ] Test emulator launches correctly
+- [x] Install Android Studio
+- [x] Install Android SDK and create virtual device (AVD)
+- [x] Accept Android licenses with `flutter doctor --android-licenses`
+- [x] Test emulator launches correctly
 
 ### Step 0.3: Create Development Documentation
 - [ ] Update `README.md` with developer setup instructions
