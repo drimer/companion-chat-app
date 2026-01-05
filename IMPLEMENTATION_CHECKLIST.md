@@ -57,7 +57,7 @@ companion-chat-app/
 - [x] Run `flutter create .` in the companion-chat-app directory
 
 ### Step 1.2: Create Basic App Structure
-- [x] Set up main.dart with MaterialApp
+- [x] Set up main.dart with MaterialAppí
 - [x] Create basic folder structure (lib/screens/)
 - [x] Run `flutter run` to verify setup works
 - [x] Update `README.md` with basic run instructions
@@ -84,20 +84,20 @@ companion-chat-app/
 ## Phase 2: Basic Message Display
 
 ### Step 2.1: Create Static Message Model
-- [ ] Create simple `Message` class in `lib/models/message.dart`
-- [ ] Include: text (String), isUser (bool)
-- [ ] No JSON serialization yet, just basic constructor
+- [x] Create simple `Message` class in `lib/models/message.dart`
+- [x] Include: role (String), content (String)
+- [x] No JSON serialization yet, just basic constructor
 
 ### Step 2.2: Create Message Bubble Widget
-- [ ] Create `message_bubble.dart` widget
-- [ ] Style user messages (right-aligned, blue)
-- [ ] Style AI messages (left-aligned, grey)
-- [ ] Test with hardcoded sample messages
+- [x] Create `message_bubble.dart` widget
+- [x] Style user messages (right-aligned, blue)
+- [x] Style AI messages (left-aligned, grey)
+- [x] Test with hardcoded sample messages
 
 ### Step 2.3: Display Sample Messages
-- [ ] Add 2-3 hardcoded messages to chat screen
-- [ ] Verify message bubbles render correctly
-- [ ] Test scrolling behavior
+- [x] Add 2-3 hardcoded messages to chat screen
+- [x] Verify message bubbles render correctly
+- [x] Test scrolling behavior
 
 ### Step 2.4: Document UI Development
 - [ ] Add section to DEVELOPMENT.md about widget development
