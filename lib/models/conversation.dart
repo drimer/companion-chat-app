@@ -19,9 +19,9 @@ class Conversation {
     final rawMessages = json['messages'];
     final messageList = rawMessages is List
         ? rawMessages
-            .whereType<Map<String, dynamic>>()
-            .map(Message.fromJson)
-            .toList()
+              .whereType<Map<String, dynamic>>()
+              .map(Message.fromJson)
+              .toList()
         : <Message>[];
 
     return Conversation(
