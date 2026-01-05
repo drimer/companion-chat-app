@@ -102,8 +102,20 @@ import 'package:http/http.dart' as http;
 - Build endpoint paths with `Uri.parse('${ApiConfig.baseUrl}/conversations/$conversationId/chat')` to keep code readable.
 - Keep this config file free of environment-specific logic; later we can swap it for injected settings.
 
+### Api Service
+- `ApiService` wraps the http client and exposes `createConversation()` and `sendMessage()` helpers.
+- Inject a custom `http.Client` when testing to stub network calls.
+- Always close the service (or client) when you are done to release sockets.
+
 ### Error Handling
-All API calls are wrapped in try-catch blocks with meaningful error messages.
+- Failures throw `ApiException` which includes optional status code and raw response.
+- Catch `ApiException` in the UI to display actionable messages and log the `details` payload for debugging.
+- When wrapping additional endpoints, reuse `_throwForError` so all HTTP error handling stays consistent.
+
+### Network Debugging Tips
+- Use `flutter pub global run devtools` to inspect logs and verify request payloads.
+- Enable a logging client (e.g., add an `http.Client` wrapper) to print requests/responses during development.
+- If calls fail with `ApiException`, check the `details` payload for backend error messages before retrying.
 
 ## Debugging Tips
 

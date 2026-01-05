@@ -176,24 +176,24 @@ companion-chat-app/
 ## Phase 5: Basic API Service
 
 ### Step 5.1: Create API Service Class
-- [ ] Create `api_service.dart` with base URL constant
-- [ ] Add `createConversation()` method
+- [x] Create `api_service.dart` with base URL constant
+- [x] Add `createConversation()` method
 - [ ] Test API call in isolation (print response)
 
 ### Step 5.2: Add Chat API Method
-- [ ] Add `sendMessage(conversationId, message)` method
-- [ ] Include proper headers and request body
+- [x] Add `sendMessage(conversationId, message)` method
+- [x] Include proper headers and request body
 - [ ] Test both API methods work
 
 ### Step 5.3: Add Error Handling
-- [ ] Wrap API calls in try-catch
-- [ ] Handle network errors gracefully
-- [ ] Return meaningful error messages
+- [x] Wrap API calls in try-catch
+- [x] Handle network errors gracefully
+- [x] Return meaningful error messages
 
 ### Step 5.4: Document API Service
-- [ ] Add API service documentation to DEVELOPMENT.md
-- [ ] Document error handling patterns
-- [ ] Add network debugging tips for development
+- [x] Add API service documentation to DEVELOPMENT.md
+- [x] Document error handling patterns
+- [x] Add network debugging tips for development
 
 ### 🧪 Test Phase 5:
 - [ ] Test `createConversation()` API call manually (print response)
