@@ -117,6 +117,28 @@ import 'package:http/http.dart' as http;
 - Enable a logging client (e.g., add an `http.Client` wrapper) to print requests/responses during development.
 - If calls fail with `ApiException`, check the `details` payload for backend error messages before retrying.
 
+## UI Integration
+
+### Wiring Services Into Widgets
+- Instantiate services (such as `ApiService`) inside a `StatefulWidget` and close them from `dispose()` to release sockets.
+- Keep request state (`_isSending`, conversation IDs) in the widget state and update it inside `setState` to drive the UI.
+- Build loading indicators conditionally (for example, show a `LinearProgressIndicator` while awaiting network calls).
+
+### Async/Await Patterns
+- Wrap asynchronous actions in `try/catch/finally` blocks and guard UI updates with `if (!mounted) return`.
+- Use optimistic UI updates for the user message, then roll back if the request fails.
+- Disable interactive controls (see `ChatInput.enabled`) while work is in flight to prevent duplicate submissions.
+
+### Error Surface
+- On failures, remove any optimistic UI changes and show a `SnackBar` with actionable guidance.
+- Log details for debugging but display concise user-friendly messages in the UI.
+- Keep failures idempotent so resending the message after a retry creates the same API request body.
+
+### API Troubleshooting
+- Confirm the base URL in `ApiConfig` matches the environment you expect before running the app.
+- If responses fail to decode, log the raw body to verify the JSON shape still matches the models.
+- Simulate offline mode (disable network) to ensure the error UI renders, then retry once connectivity returns.
+
 ## Debugging Tips
 
 ### Common Issues

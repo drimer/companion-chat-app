@@ -206,14 +206,14 @@ companion-chat-app/
 ## Phase 6: Connect API to UI
 
 ### Step 6.1: Integrate Conversation Creation
-- [ ] Modify chat screen to call API on first message
-- [ ] Store conversation ID in widget state
-- [ ] Show loading indicator during API calls
+- [x] Modify chat screen to call API on first message
+- [x] Store conversation ID in widget state
+- [x] Show loading indicator during API calls
 
 ### Step 6.2: Integrate Chat API
-- [ ] Replace mock AI responses with real API calls
-- [ ] Handle loading states properly
-- [ ] Display API errors to user
+- [x] Replace mock AI responses with real API calls
+- [x] Handle loading states properly
+- [x] Display API errors to user
 
 ### Step 6.3: Test Complete Flow
 - [ ] Test first message (creates conversation + gets response)

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 class ChatInput extends StatefulWidget {
-  const ChatInput({super.key, required this.onSend});
+  const ChatInput({super.key, required this.onSend, this.enabled = true});
 
   final ValueChanged<String> onSend;
+  final bool enabled;
 
   @override
   State<ChatInput> createState() => _ChatInputState();
@@ -20,7 +21,7 @@ class _ChatInputState extends State<ChatInput> {
 
   void _handleSend() {
     final text = _controller.text.trim();
-    if (text.isEmpty) {
+    if (!widget.enabled || text.isEmpty) {
       return;
     }
     widget.onSend(text);
@@ -36,6 +37,7 @@ class _ChatInputState extends State<ChatInput> {
             controller: _controller,
             textInputAction: TextInputAction.send,
             onSubmitted: (_) => _handleSend(),
+            enabled: widget.enabled,
             decoration: const InputDecoration(
               hintText: 'Type your message...',
               border: OutlineInputBorder(),
@@ -43,7 +45,10 @@ class _ChatInputState extends State<ChatInput> {
           ),
         ),
         const SizedBox(width: 8),
-        IconButton(icon: const Icon(Icons.send), onPressed: _handleSend),
+        IconButton(
+          icon: const Icon(Icons.send),
+          onPressed: widget.enabled ? _handleSend : null,
+        ),
       ],
     );
   }
