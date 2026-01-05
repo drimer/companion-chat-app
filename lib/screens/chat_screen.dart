@@ -138,35 +138,38 @@ class _ChatScreenState extends State<ChatScreen> {
         title: const Text('Companion Chat'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: Column(
-        children: [
-          if (_isInitializing || _isSending) const LinearProgressIndicator(),
-          Expanded(
-            child: _isInitializing && _messages.isEmpty
-                ? const Center(child: CircularProgressIndicator())
-                : ListView.separated(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 16,
+      body: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            if (_isInitializing || _isSending) const LinearProgressIndicator(),
+            Expanded(
+              child: _isInitializing && _messages.isEmpty
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.separated(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 16,
+                      ),
+                      reverse: true,
+                      itemCount: _messages.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 8),
+                      itemBuilder: (context, index) {
+                        final message = _messages[_messages.length - 1 - index];
+                        return MessageBubble(message: message);
+                      },
                     ),
-                    reverse: true,
-                    itemCount: _messages.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 8),
-                    itemBuilder: (context, index) {
-                      final message = _messages[_messages.length - 1 - index];
-                      return MessageBubble(message: message);
-                    },
-                  ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ChatInput(
-              onSend: _handleSend,
-              enabled: !_isSending && !_isInitializing,
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ChatInput(
+                onSend: _handleSend,
+                enabled: !_isSending && !_isInitializing,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
