@@ -114,22 +114,22 @@ companion-chat-app/
 ## Phase 3: Basic Input UI
 
 ### Step 3.1: Create Chat Input Widget
-- [ ] Create `chat_input.dart` with TextField and IconButton
-- [ ] Position at bottom of screen
-- [ ] No functionality yet, just visual layout
-- [ ] Test that it looks like a proper chat input
+- [x] Create `chat_input.dart` with TextField and IconButton
+- [x] Position at bottom of screen
+- [x] No functionality yet, just visual layout
+- [x] Test that it looks like a proper chat input
 
 ### Step 3.2: Add Input Interaction
-- [ ] Add TextEditingController
-- [ ] Handle send button press (just print message for now)
-- [ ] Clear input field after send
-- [ ] Add basic validation (don't send empty messages)
+- [x] Add TextEditingController
+- [x] Handle send button press (just print message for now)
+- [x] Clear input field after send
+- [x] Add basic validation (don't send empty messages)
 
 ### Step 3.3: Add Messages to List Locally
-- [ ] Modify chat screen to maintain List<Message>
-- [ ] Add user messages to list when send is pressed
-- [ ] Add mock AI response after 1-second delay
-- [ ] Verify chat updates properly
+- [x] Modify chat screen to maintain List<Message>
+- [x] Add user messages to list when send is pressed
+- [x] Add mock AI response after 1-second delay
+- [x] Verify chat updates properly
 
 ### Step 3.4: Document State Management
 - [ ] Add section to DEVELOPMENT.md about Flutter state management
