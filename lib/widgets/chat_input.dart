@@ -43,10 +43,7 @@ class _ChatInputState extends State<ChatInput> {
           ),
         ),
         const SizedBox(width: 8),
-        IconButton(
-          icon: const Icon(Icons.send),
-          onPressed: _handleSend,
-        ),
+        IconButton(icon: const Icon(Icons.send), onPressed: _handleSend),
       ],
     );
   }

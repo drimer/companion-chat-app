@@ -48,10 +48,7 @@ class _ChatScreenState extends State<ChatScreen> {
     Future<void>.delayed(
       const Duration(seconds: 1),
       () => _addMessage(
-        Message(
-          role: 'assistant',
-          content: 'Thanks for sharing: $content',
-        ),
+        Message(role: 'assistant', content: 'Thanks for sharing: $content'),
       ),
     );
   }

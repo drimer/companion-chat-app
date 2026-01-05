@@ -46,6 +46,16 @@ lib/
 ### State Management
 This project uses Flutter's built-in `setState` for state management.
 
+#### Working with `setState`
+- Keep widget state inside the owning `State` class and mutate it only inside `setState` callbacks.
+- Schedule side effects (timers, animations, API calls) outside the `build` method to avoid unintended rebuild loops.
+- When updating collections like lists or maps, create a new instance or mutate and then wrap the change in `setState` so Flutter knows to rebuild.
+
+#### Debugging UI State
+- Add `debugPrint` calls around `setState` to confirm when state transitions happen.
+- Use Flutter Inspector's widget rebuild highlights to ensure only the expected widgets redraw.
+- If UI is not updating, verify that the widget depends on the mutated state and that `setState` is executed (breakpoints help).
+
 ### Widget Hierarchy
 ```
 CompanionChatApp (MaterialApp)
@@ -56,6 +66,23 @@ CompanionChatApp (MaterialApp)
         └── Padding (Input Area)
 ```
 
+## Widget Development
+
+### Building Reusable Widgets
+- Use stateless widgets for pure presentation (for example, `MessageBubble`).
+- Promote complex UI fragments into their own widgets to keep `build` methods short.
+- Expose behavior through callbacks (for example, `ChatInput.onSend`) so parent widgets control data flow.
+
+### Common Layout Patterns
+- **Column + Expanded** keeps the message list flexible while pinning the input field to the bottom.
+- **ListView.separated** renders long chat histories efficiently and inserts consistent spacing.
+- **Align + ConstrainedBox** shapes each chat bubble while keeping messages readable on tablets and phones.
+
+### Widget Tree Concepts
+- Prefer composition: build small widgets and assemble them higher in the tree.
+- Pass immutable model objects (like `Message`) down the tree to keep widgets predictable.
+- When debugging layout, use `Flutter Inspector`'s Layout Explorer to visualize padding, alignment, and constraints.
+
 ## API Integration
 
 ### Endpoints Used
@@ -63,10 +90,17 @@ CompanionChatApp (MaterialApp)
 - **Send Message**: `POST https://uycxfk6mv4.execute-api.eu-west-2.amazonaws.com/dev/conversations/{id}/chat`
 
 ### HTTP Package
+Install dependencies with `flutter pub get` after updating `pubspec.yaml`.
+
 We use the `http` package for API calls:
 ```dart
 import 'package:http/http.dart' as http;
 ```
+
+### Base URL Configuration
+- The API base URL lives in `ApiConfig.baseUrl` so it can be updated in a single place.
+- Build endpoint paths with `Uri.parse('${ApiConfig.baseUrl}/conversations/$conversationId/chat')` to keep code readable.
+- Keep this config file free of environment-specific logic; later we can swap it for injected settings.
 
 ### Error Handling
 All API calls are wrapped in try-catch blocks with meaningful error messages.

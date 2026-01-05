@@ -100,9 +100,9 @@ companion-chat-app/
 - [x] Test scrolling behavior
 
 ### Step 2.4: Document UI Development
-- [ ] Add section to DEVELOPMENT.md about widget development
-- [ ] Document Flutter widget tree concepts
-- [ ] Add examples of common Flutter layouts used in the project
+- [x] Add section to DEVELOPMENT.md about widget development
+- [x] Document Flutter widget tree concepts
+- [x] Add examples of common Flutter layouts used in the project
 
 ### 🧪 Test Phase 2:
 - [ ] Hot reload and verify hardcoded messages appear
@@ -132,9 +132,9 @@ companion-chat-app/
 - [x] Verify chat updates properly
 
 ### Step 3.4: Document State Management
-- [ ] Add section to DEVELOPMENT.md about Flutter state management
-- [ ] Document setState pattern used in the project
-- [ ] Add debugging tips for UI state issues
+- [x] Add section to DEVELOPMENT.md about Flutter state management
+- [x] Document setState pattern used in the project
+- [x] Add debugging tips for UI state issues
 
 ### 🧪 Test Phase 3:
 - [ ] Type a message and verify the input field works
@@ -147,24 +147,24 @@ companion-chat-app/
 ## Phase 4: API Integration Setup
 
 ### Step 4.1: Add HTTP Dependency
-- [ ] Update `pubspec.yaml` with `http` package
-- [ ] Run `flutter pub get`
-- [ ] Document dependency management in DEVELOPMENT.md
+- [x] Update `pubspec.yaml` with `http` package
+- [x] Run `flutter pub get`
+- [x] Document dependency management in DEVELOPMENT.md
 
 ### Step 4.2: Create Conversation Model
-- [ ] Define `Conversation` class matching API response
-- [ ] Include JSON serialization (fromJson/toJson)
+- [x] Define `Conversation` class matching API response
+- [x] Include JSON serialization (fromJson/toJson)
 - [ ] Test JSON parsing with sample data
 
 ### Step 4.3: Create Chat Response Model
-- [ ] Define `ChatResponse` class for API responses
-- [ ] Include JSON serialization
+- [x] Define `ChatResponse` class for API responses (it only contains a field called "message", which will be used to store a new Message with role "assistant")
+- [x] Include JSON serialization
 - [ ] Test JSON parsing
 
 ### Step 4.4: Document API Integration
-- [ ] Add section to DEVELOPMENT.md about HTTP requests in Flutter
-- [ ] Document the API endpoints being used
-- [ ] Add examples of JSON model classes
+- [x] Add section to DEVELOPMENT.md about HTTP requests in Flutter
+- [x] Document the API endpoints being used
+- [x] Add examples of JSON model classes
 
 ### 🧪 Test Phase 4:
 - [ ] Run `flutter pub get` successfully
