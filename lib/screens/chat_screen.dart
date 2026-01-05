@@ -36,30 +36,17 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _initialize() async {
     try {
-      if (!mounted) {
-        return;
+      await _ensureConversation();
+    } catch (error) {
+      if (mounted) {
+        _showError('Unable to start a new conversation.');
       }
-
-      if (_messages.isNotEmpty) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!_scrollController.hasClients) {
-            return;
-          }
-          _scrollController.jumpTo(0);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isInitializing = false;
         });
       }
-
-      setState(() {
-        _isInitializing = false;
-      });
-    } catch (error) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {
-        _isInitializing = false;
-      });
-      _showError('Unable to load saved conversation.');
     }
   }
 
@@ -85,8 +72,21 @@ class _ChatScreenState extends State<ChatScreen> {
     }
 
     final conversation = await _apiService.createConversation();
-    _conversationId = conversation.id;
-    return _conversationId!;
+    if (!mounted) {
+      return conversation.id;
+    }
+
+    setState(() {
+      _conversationId = conversation.id;
+    });
+
+    if (conversation.messages.isNotEmpty) {
+      for (final message in conversation.messages) {
+        _addMessage(message);
+      }
+    }
+
+    return conversation.id;
   }
 
   Future<void> _handleSend(String content) async {
@@ -98,11 +98,12 @@ class _ChatScreenState extends State<ChatScreen> {
       _isSending = true;
     });
 
-    final userMessage = Message(role: 'user', content: content);
-    _addMessage(userMessage);
+    Message? userMessage;
 
     try {
       final conversationId = await _ensureConversation();
+      userMessage = Message(role: 'user', content: content);
+      _addMessage(userMessage);
       final history = List<Message>.unmodifiable(_messages);
       final response = await _apiService.sendMessage(
         conversationId: conversationId,
@@ -112,7 +113,9 @@ class _ChatScreenState extends State<ChatScreen> {
     } catch (error) {
       if (mounted) {
         setState(() {
-          _messages.remove(userMessage);
+          if (userMessage != null) {
+            _messages.remove(userMessage);
+          }
         });
       }
       _showError('Unable to send message. Please try again.');
