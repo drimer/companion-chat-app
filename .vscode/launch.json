@@ -9,7 +9,20 @@
             "type": "dart",
             "request": "launch",
             "program": "lib/main.dart",
-            "deviceId": "windows"
+            "deviceId": "windows",
+            "toolArgs": [
+                "--dart-define-from-file=env/settings.env"
+            ]
+        },
+        {
+            "name": "Flutter Android",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "deviceId": "R5CW72EXHDH",
+            "toolArgs": [
+                "--dart-define-from-file=env/settings.env"
+            ]
         }
     ]
 }

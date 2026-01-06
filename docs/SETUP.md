@@ -71,3 +71,36 @@ flutter run
 ```
 
 All checkmarks should be green, and the test app should run successfully.
+
+## Environment Configuration
+
+1. Copy `env/settings.env.template` to `env/settings.env` (git ignored) and replace the placeholder value:
+   ```text
+   API_BASE_URL=http://localhost:4000
+   # API_BASE_URL=https://example.your-domain.com
+   ```
+   Lines starting with `#` are treated as comments, so keep alternative values handy without changing the active one.
+2. Update `.vscode/launch.json` so the Android `deviceId` matches your connected device; the Windows entry is preconfigured.
+3. Launch the app with the shared file:
+   - Windows desktop: `flutter run -d windows --dart-define-from-file=env/settings.env`
+   - Android device (auto-detected when only one is connected): `flutter run --dart-define-from-file=env/settings.env`
+4. Building also uses the same flag, for example: `flutter build apk --dart-define-from-file=env/settings.env`.
+
+Whichever command you use (VS Code or terminal), always supply `--dart-define-from-file=env/settings.env` so the app receives the base URL at runtime.
+
+## Installing Dependencies
+
+From the project root:
+
+```bash
+flutter pub get
+```
+
+Run this command any time `pubspec.yaml` changes so packages stay in sync.
+
+## Troubleshooting
+
+- **"flutter: command not found"**: Ensure the Flutter SDK path is on your system PATH.
+- **Build errors after pulling changes**: Run `flutter clean` followed by `flutter pub get`.
+- **No devices found**: Start an Android emulator or connect a physical device; for Windows ensure desktop support is enabled (`flutter config --enable-windows-desktop`).
+- **General diagnostics**: `flutter doctor` highlights missing components or permission issues.

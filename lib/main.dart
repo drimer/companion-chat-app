@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+
+import 'services/api_config.dart';
 import 'screens/chat_screen.dart';
 
 void main() {
+  ApiConfig.ensureConfigured();
   runApp(const CompanionChatApp());
 }
 
@@ -20,5 +23,3 @@ class CompanionChatApp extends StatelessWidget {
     );
   }
 }
-
-

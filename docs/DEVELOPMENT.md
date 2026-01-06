@@ -1,36 +1,12 @@
 # Development Guide
 
-## Common Flutter Commands
+## Tooling Reference
 
-### Development
-- `flutter run` - Run in debug mode
-- `flutter run -d <device>` - Run on specific device
-- `flutter run --release` - Run in release mode (optimized)
-- **VS Code**: Start the **Flutter Windows** configuration from Run and Debug for a prewired desktop launch.
+Use the official Flutter resources for command usage and IDE integration:
 
-### Hot Reload
-- `r` - Hot reload (apply changes without restarting)
-- `R` - Hot restart (restart the app completely)
-- `q` - Quit the app
-
-### Building
-- `flutter build apk` - Build Android APK
-- `flutter build windows` - Build Windows executable
-- `flutter build web` - Build for web
-
-### Debugging
-- `flutter logs` - View device logs
-- `flutter analyze` - Static code analysis
-- `flutter test` - Run unit tests
-
-### Dependencies
-- `flutter pub get` - Install dependencies
-- `flutter pub upgrade` - Upgrade dependencies
-- `flutter pub deps` - Show dependency tree
-
-### Cleanup
-- `flutter clean` - Clean build artifacts
-- `flutter pub cache repair` - Repair pub cache
+- Flutter CLI overview: [https://docs.flutter.dev/reference/flutter-cli](https://docs.flutter.dev/reference/flutter-cli)
+- Hot reload and debugging guide: [https://docs.flutter.dev/tools/hot-reload](https://docs.flutter.dev/tools/hot-reload)
+- VS Code extension walkthrough: [https://docs.flutter.dev/tools/vs-code](https://docs.flutter.dev/tools/vs-code)
 
 ## Project Architecture
 
@@ -98,45 +74,6 @@ We use the `http` package for API calls:
 import 'package:http/http.dart' as http;
 ```
 
-### Base URL Configuration
-- The API base URL lives in `ApiConfig.baseUrl` so it can be updated in a single place.
-- Build endpoint paths with `Uri.parse('${ApiConfig.baseUrl}/conversations/$conversationId/chat')` to keep code readable.
-- Keep this config file free of environment-specific logic; later we can swap it for injected settings.
-
-### Api Service
-- `ApiService` wraps the http client and exposes `createConversation()` and `sendMessage()` helpers.
-- Inject a custom `http.Client` when testing to stub network calls.
-- Always close the service (or client) when you are done to release sockets.
-
-### Error Handling
-- Failures throw `ApiException` which includes optional status code and raw response.
-- Catch `ApiException` in the UI to display actionable messages and log the `details` payload for debugging.
-- When wrapping additional endpoints, reuse `_throwForError` so all HTTP error handling stays consistent.
-
-### Network Debugging Tips
-- Use `flutter pub global run devtools` to inspect logs and verify request payloads.
-- Enable a logging client (e.g., add an `http.Client` wrapper) to print requests/responses during development.
-- If calls fail with `ApiException`, check the `details` payload for backend error messages before retrying.
-
-## UI Integration
-
-### Wiring Services Into Widgets
-- Create the `ApiService` once in the `State` of the host widget and close it from `dispose()` so sockets are released promptly.
-- Hold request state such as `_conversationId`, `_isSending`, and `_isInitializing` on the widget and update it inside `setState` to refresh UI elements.
-- Pair mutations with UI cues: `ChatScreen` shows a `LinearProgressIndicator` while `_isSending` or `_isInitializing` is true so users see work in flight.
-- Scroll controllers need explicit disposal; keep them alongside the network service so lifecycle management stays centralized.
-
-### Async/Await Patterns
-- Guard asynchronous flows with `try/catch/finally` and bail out of UI updates when `!mounted` to avoid exceptions after navigation.
-- Use `_ensureConversation()` to memoize the server conversation ID; concurrent calls await the same future before sending messages.
-- Stage optimistic updates for user messages, then remove them inside the `catch` branch if the API call fails so history stays accurate.
-- Toggle `ChatInput.enabled` off while awaiting API responses to prevent double submissions and keep message order consistent.
-
-### Error Surface
-- On failures, remove any optimistic UI changes and show a `SnackBar` with actionable guidance.
-- Log details for debugging but display concise user-friendly messages in the UI.
-- Keep failures idempotent so resending the message after a retry creates the same API request body.
-
 ### API Troubleshooting
 - Confirm the base URL in `ApiConfig` matches the environment you expect before running the app.
 - If responses fail to decode, log the raw body to verify the JSON shape still matches the models.
@@ -150,23 +87,10 @@ import 'package:http/http.dart' as http;
 
 ## Debugging Tips
 
-### Common Issues
-1. **Import errors**: Check file paths and ensure files exist
-2. **State not updating**: Make sure to call `setState()`
-3. **API errors**: Check network connectivity and API endpoints
-4. **Build errors**: Run `flutter clean` and `flutter pub get`
-
 ### Development Tools
 - **Flutter Inspector**: Visual widget tree debugging
 - **DevTools**: Performance and memory profiling
 - **Debug Console**: Print statements and error logs
-
-### Hot Reload Best Practices
-- Hot reload works for UI changes
-- Hot restart needed for:
-  - App initialization code
-  - Method signatures
-  - Static variables
 
 ## Testing
 
@@ -184,17 +108,3 @@ test/
 ├── widget/         # UI component tests
 └── integration/    # End-to-end tests
 ```
-
-## Performance
-
-### Best Practices
-- Use `const` constructors when possible
-- Avoid rebuilding widgets unnecessarily
-- Use `ListView.builder` for long lists
-- Profile with DevTools
-
-### Common Performance Issues
-- Large widget trees
-- Expensive build methods
-- Memory leaks from listeners
-- Blocking the UI thread
