@@ -5,9 +5,12 @@ import '../models/message.dart';
 import '../services/api_service.dart';
 import '../widgets/chat_input.dart';
 import '../widgets/message_bubble.dart';
+import '../widgets/typing_indicator.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+  const ChatScreen({super.key, this.apiService});
+
+  final ApiService? apiService;
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -15,8 +18,9 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
-  final ApiService _apiService = ApiService();
   final List<Message> _messages = <Message>[];
+  late final ApiService _apiService;
+  late final bool _ownsApiService;
   String? _conversationId;
   bool _isSending = false;
   bool _isInitializing = true;
@@ -24,13 +28,17 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
+    _apiService = widget.apiService ?? ApiService();
+    _ownsApiService = widget.apiService == null;
     _initialize();
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
-    _apiService.close();
+    if (_ownsApiService) {
+      _apiService.close();
+    }
     super.dispose();
   }
 
@@ -49,6 +57,8 @@ class _ChatScreenState extends State<ChatScreen> {
       }
     }
   }
+
+  bool get _showTypingIndicator => _isSending && _messages.isNotEmpty;
 
   void _addMessage(Message message) {
     setState(() {
@@ -145,22 +155,48 @@ class _ChatScreenState extends State<ChatScreen> {
         top: false,
         child: Column(
           children: [
-            if (_isInitializing || _isSending) const LinearProgressIndicator(),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: _isInitializing || _isSending
+                  ? const LinearProgressIndicator(
+                      key: ValueKey('progress-indicator'),
+                    )
+                  : const SizedBox.shrink(
+                      key: ValueKey('progress-placeholder'),
+                    ),
+            ),
             Expanded(
               child: _isInitializing && _messages.isEmpty
                   ? const Center(child: CircularProgressIndicator())
-                  : ListView.separated(
-                      controller: _scrollController,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 16,
-                      ),
-                      reverse: true,
-                      itemCount: _messages.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 8),
-                      itemBuilder: (context, index) {
-                        final message = _messages[_messages.length - 1 - index];
-                        return MessageBubble(message: message);
+                  : Builder(
+                      builder: (context) {
+                        final showTypingIndicator = _showTypingIndicator;
+                        final totalMessages = _messages.length;
+
+                        return ListView.separated(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 16,
+                          ),
+                          reverse: true,
+                          itemCount:
+                              totalMessages + (showTypingIndicator ? 1 : 0),
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 8),
+                          itemBuilder: (context, index) {
+                            if (showTypingIndicator && index == 0) {
+                              return const TypingIndicator();
+                            }
+
+                            final offset = showTypingIndicator
+                                ? index - 1
+                                : index;
+                            final message =
+                                _messages[totalMessages - 1 - offset];
+                            return MessageBubble(message: message);
+                          },
+                        );
                       },
                     ),
             ),

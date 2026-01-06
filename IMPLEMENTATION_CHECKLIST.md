@@ -235,9 +235,9 @@ companion-chat-app/
 ## Phase 7: Polish and Error Handling
 
 ### Step 7.1: Improve Loading States
-- [ ] Add typing indicator for AI responses
-- [ ] Disable send button during API calls
-- [ ] Better visual feedback
+- [x] Add typing indicator for AI responses
+- [x] Disable send button during API calls
+- [x] Better visual feedback
 
 ### Step 7.2: Enhanced Error Handling
 - [ ] Retry failed API calls
