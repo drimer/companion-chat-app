@@ -120,14 +120,16 @@ import 'package:http/http.dart' as http;
 ## UI Integration
 
 ### Wiring Services Into Widgets
-- Instantiate services (such as `ApiService`) inside a `StatefulWidget` and close them from `dispose()` to release sockets.
-- Keep request state (`_isSending`, conversation IDs) in the widget state and update it inside `setState` to drive the UI.
-- Build loading indicators conditionally (for example, show a `LinearProgressIndicator` while awaiting network calls).
+- Create the `ApiService` once in the `State` of the host widget and close it from `dispose()` so sockets are released promptly.
+- Hold request state such as `_conversationId`, `_isSending`, and `_isInitializing` on the widget and update it inside `setState` to refresh UI elements.
+- Pair mutations with UI cues: `ChatScreen` shows a `LinearProgressIndicator` while `_isSending` or `_isInitializing` is true so users see work in flight.
+- Scroll controllers need explicit disposal; keep them alongside the network service so lifecycle management stays centralized.
 
 ### Async/Await Patterns
-- Wrap asynchronous actions in `try/catch/finally` blocks and guard UI updates with `if (!mounted) return`.
-- Use optimistic UI updates for the user message, then roll back if the request fails.
-- Disable interactive controls (see `ChatInput.enabled`) while work is in flight to prevent duplicate submissions.
+- Guard asynchronous flows with `try/catch/finally` and bail out of UI updates when `!mounted` to avoid exceptions after navigation.
+- Use `_ensureConversation()` to memoize the server conversation ID; concurrent calls await the same future before sending messages.
+- Stage optimistic updates for user messages, then remove them inside the `catch` branch if the API call fails so history stays accurate.
+- Toggle `ChatInput.enabled` off while awaiting API responses to prevent double submissions and keep message order consistent.
 
 ### Error Surface
 - On failures, remove any optimistic UI changes and show a `SnackBar` with actionable guidance.
@@ -137,7 +139,13 @@ import 'package:http/http.dart' as http;
 ### API Troubleshooting
 - Confirm the base URL in `ApiConfig` matches the environment you expect before running the app.
 - If responses fail to decode, log the raw body to verify the JSON shape still matches the models.
-- Simulate offline mode (disable network) to ensure the error UI renders, then retry once connectivity returns.
+- When initialization fails, `_isInitializing` stays true and the loading indicator persists—restart after restoring connectivity to retry `createConversation()`.
+- Simulate offline mode (airplane mode) to confirm the `SnackBar` error path is working, then toggle connectivity back on and resend to resume the flow.
+
+### Integration Checklist
+- Conversation bootstrap: `_initialize()` awaits `_ensureConversation()` and primes any server-seeded history before enabling input.
+- Message send flow: `_handleSend()` adds the user message, posts the full history, then appends the assistant reply on success.
+- Cleanup: dispose scroll controllers and close services in `dispose()` to prevent leaks during hot reload cycles.
 
 ## Debugging Tips
 

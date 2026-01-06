@@ -215,22 +215,22 @@ companion-chat-app/
 - [x] Display API errors to user
 
 ### Step 6.3: Test Complete Flow
-- [ ] Test first message (creates conversation + gets response)
-- [ ] Test subsequent messages (uses existing conversation)
-- [ ] Verify error handling works
+- [x] Test first message (creates conversation + gets response)
+- [x] Test subsequent messages (uses existing conversation)
+- [x] Verify error handling works
 
 ### Step 6.4: Document Integration Patterns
-- [ ] Add section about connecting services to UI
-- [ ] Document async/await patterns used
-- [ ] Add troubleshooting guide for API integration issues
+- [x] Add section about connecting services to UI
+- [x] Document async/await patterns used
+- [x] Add troubleshooting guide for API integration issues
 
 ### 🧪 Test Phase 6:
-- [ ] Send your first message and verify conversation is created
-- [ ] Check that you get a real AI response (in Japanese for language exchange)
-- [ ] Send a second message and verify it uses the same conversation
-- [ ] Test with airplane mode to verify error handling
-- [ ] Verify loading indicators appear during API calls
-- [ ] Test that the app recovers gracefully from API errors
+- [x] Send your first message and verify conversation is created
+- [x] Check that you get a real AI response (in Japanese for language exchange)
+- [x] Send a second message and verify it uses the same conversation
+- [x] Test with airplane mode to verify error handling
+- [x] Verify loading indicators appear during API calls
+- [x] Test that the app recovers gracefully from API errors
 
 ## Phase 7: Polish and Error Handling
 
@@ -245,7 +245,6 @@ companion-chat-app/
 - [ ] User-friendly error messages
 
 ### Step 7.3: Finalize Documentation
-- [ ] Complete `README.md` with full setup and usage instructions
 - [ ] Add deployment section (how to build APK/release)
 - [ ] Create troubleshooting guide for common issues
 - [ ] Document testing procedures
