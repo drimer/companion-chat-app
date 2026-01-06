@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:companion_chat_app/models/chat_response.dart';
 import 'package:companion_chat_app/models/message.dart';
 import 'package:companion_chat_app/screens/chat_screen.dart';
+import 'package:companion_chat_app/services/api_service.dart';
 import '../mocks/api_service_mock.dart';
 
 Widget _wrapWithApp(Widget child) {
@@ -56,5 +57,44 @@ void main() {
     expect(find.text('Thanks for sharing: This is a test'), findsOneWidget);
     final textFieldWidget = tester.widget<TextField>(textField);
     expect(textFieldWidget.controller?.text, isEmpty);
+  });
+
+  testWidgets('Displays offline banner when send fails with offline error', (
+    WidgetTester tester,
+  ) async {
+    final service = ApiServiceMock(
+      onSend: (_) async {
+        throw ApiException('No internet connection.', isOffline: true);
+      },
+    );
+
+    await tester.pumpWidget(_wrapWithApp(ChatScreen(apiService: service)));
+    await tester.pumpAndSettle();
+
+    final textField = find.byType(TextField);
+    final sendButton = find.byIcon(Icons.send);
+
+    await tester.enterText(textField, 'Offline test');
+    await tester.tap(sendButton);
+
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(find.text('Offline test'), findsOneWidget);
+    expect(
+      find.text('You are offline. Messages will be sent once you reconnect.'),
+      findsOneWidget,
+    );
+    expect(find.byIcon(Icons.wifi_off), findsOneWidget);
+    expect(
+      find.text('Not delivered. An unexpected error occurred.'),
+      findsOneWidget,
+    );
+    expect(
+      find.text(
+        'You appear to be offline. Check your connection and try again.',
+      ),
+      findsOneWidget,
+    );
   });
 }

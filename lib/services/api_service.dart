@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
@@ -8,18 +9,22 @@ import '../models/message.dart';
 import 'api_config.dart';
 
 class ApiException implements Exception {
-  ApiException(this.message, {this.statusCode, this.details});
+  ApiException(
+    this.message, {
+    this.statusCode,
+    this.details,
+    this.isOffline = false,
+  });
 
   final String message;
   final int? statusCode;
   final Object? details;
+  final bool isOffline;
 
   @override
   String toString() {
-    if (statusCode == null) {
-      return 'ApiException: $message';
-    }
-    return 'ApiException($statusCode): $message';
+    final statusSuffix = statusCode == null ? '' : '($statusCode)';
+    return 'ApiException$statusSuffix: $message';
   }
 }
 
@@ -97,6 +102,13 @@ class ApiService {
   ApiException _wrapError(String action, Object error) {
     if (error is ApiException) {
       return error;
+    }
+    if (error is SocketException) {
+      return ApiException(
+        'No internet connection.',
+        details: error,
+        isOffline: true,
+      );
     }
     return ApiException('Unable to $action: $error', details: error);
   }

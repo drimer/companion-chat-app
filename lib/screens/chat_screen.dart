@@ -24,6 +24,7 @@ class _ChatScreenState extends State<ChatScreen> {
   String? _conversationId;
   bool _isSending = false;
   bool _isInitializing = true;
+  bool _isOffline = false;
 
   @override
   void initState() {
@@ -46,8 +47,16 @@ class _ChatScreenState extends State<ChatScreen> {
     try {
       await _ensureConversation();
     } catch (error) {
+      final offline = _isOfflineError(error);
+      if (offline) {
+        _setOffline(true);
+      }
       if (mounted) {
-        _showError('Unable to start a new conversation.');
+        _showError(
+          offline
+              ? 'You appear to be offline. Check your connection and try again.'
+              : 'Unable to start a new conversation.',
+        );
       }
     } finally {
       if (mounted) {
@@ -59,6 +68,19 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   bool get _showTypingIndicator => _isSending && _messages.isNotEmpty;
+
+  bool _isOfflineError(Object error) {
+    return error is ApiException && error.isOffline;
+  }
+
+  void _setOffline(bool value) {
+    if (_isOffline == value || !mounted) {
+      return;
+    }
+    setState(() {
+      _isOffline = value;
+    });
+  }
 
   void _addMessage(Message message) {
     setState(() {
@@ -88,6 +110,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     setState(() {
       _conversationId = conversation.id;
+      _isOffline = false;
     });
 
     if (conversation.messages.isNotEmpty) {
@@ -124,7 +147,9 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       );
       _addMessage(Message(role: 'assistant', content: response.message));
+      _setOffline(false);
     } catch (error) {
+      final offline = _isOfflineError(error);
       if (mounted) {
         setState(() {
           if (userMessage != null) {
@@ -133,9 +158,16 @@ class _ChatScreenState extends State<ChatScreen> {
               _messages[index] = userMessage.copyWith(deliveryFailed: true);
             }
           }
+          if (offline) {
+            _isOffline = true;
+          }
         });
       }
-      _showError('Unable to send message. Please try again.');
+      _showError(
+        offline
+            ? 'You appear to be offline. Check your connection and try again.'
+            : 'Unable to send message. Please try again.',
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -184,13 +216,43 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
-              child: _isInitializing || _isSending
-                  ? const LinearProgressIndicator(
-                      key: ValueKey('progress-indicator'),
+              child: _isOffline
+                  ? Container(
+                      key: const ValueKey('offline-banner'),
+                      width: double.infinity,
+                      color: Theme.of(context).colorScheme.errorContainer,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.wifi_off,
+                            size: 16,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onErrorContainer,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'You are offline. Messages will be sent once you reconnect.',
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onErrorContainer,
+                                  ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
                     )
-                  : const SizedBox.shrink(
-                      key: ValueKey('progress-placeholder'),
-                    ),
+                  : const SizedBox.shrink(key: ValueKey('offline-placeholder')),
             ),
             Expanded(
               child: _isInitializing && _messages.isEmpty

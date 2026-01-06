@@ -242,7 +242,7 @@ companion-chat-app/
 ### Step 7.2: Enhanced Error Handling
 - [x] Retry failed API calls only once (both when starting a new conversation, and when sending a message in an ongoing conversation)
 - [x] During an existing conversation, when the second attempt at a API call also fails, show the message written by the user as a greyed out bubble so that they can copy-paste it if they want
-- [ ] Handle offline scenarios
+- [x] Handle offline scenarios
 - [ ] User-friendly error messages
 
 ### Step 7.3: Finalize Documentation
