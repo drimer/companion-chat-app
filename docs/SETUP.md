@@ -27,6 +27,12 @@
    flutter doctor
    ```
 
+   ## VS Code Debugging
+
+   - Open the project in VS Code.
+   - Go to **Run and Debug** and select **Flutter Windows** to launch the app using the predefined configuration (equivalent to `flutter run -d windows`).
+   - Use the standard debug controls for hot reload, breakpoints, and logging.
+
 ## Android Development Setup
 
 1. **Install Android Studio**

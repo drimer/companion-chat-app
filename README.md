@@ -27,6 +27,8 @@ A Flutter mobile app for chatting with an AI language exchange partner.
    flutter run -d chrome     # Run in web browser
    ```
 
+   VS Code users can open **Run and Debug** and start the **Flutter Windows** configuration to launch the desktop build without typing the command.
+
 ## Development
 
 - `flutter run` - Run in debug mode

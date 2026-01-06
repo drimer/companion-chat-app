@@ -6,6 +6,7 @@
 - `flutter run` - Run in debug mode
 - `flutter run -d <device>` - Run on specific device
 - `flutter run --release` - Run in release mode (optimized)
+- **VS Code**: Start the **Flutter Windows** configuration from Run and Debug for a prewired desktop launch.
 
 ### Hot Reload
 - `r` - Hot reload (apply changes without restarting)
