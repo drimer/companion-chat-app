@@ -81,9 +81,7 @@ class _ChatScreenState extends State<ChatScreen> {
       return _conversationId!;
     }
 
-    final conversation = await _retry(
-      () => _apiService.createConversation(),
-    );
+    final conversation = await _retry(() => _apiService.createConversation());
     if (!mounted) {
       return conversation.id;
     }
@@ -116,7 +114,9 @@ class _ChatScreenState extends State<ChatScreen> {
       final conversationId = await _ensureConversation();
       userMessage = Message(role: 'user', content: content);
       _addMessage(userMessage);
-      final history = List<Message>.unmodifiable(_messages);
+      final history = List<Message>.unmodifiable(
+        _messages.where((message) => !message.deliveryFailed),
+      );
       final response = await _retry(
         () => _apiService.sendMessage(
           conversationId: conversationId,
@@ -128,7 +128,10 @@ class _ChatScreenState extends State<ChatScreen> {
       if (mounted) {
         setState(() {
           if (userMessage != null) {
-            _messages.remove(userMessage);
+            final index = _messages.indexOf(userMessage);
+            if (index >= 0) {
+              _messages[index] = userMessage.copyWith(deliveryFailed: true);
+            }
           }
         });
       }

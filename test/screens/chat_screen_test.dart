@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:companion_chat_app/models/chat_response.dart';
 import 'package:companion_chat_app/models/message.dart';
 import 'package:companion_chat_app/screens/chat_screen.dart';
-import 'mocks/api_service_mock.dart';
+import '../mocks/api_service_mock.dart';
 
 Widget _wrapWithApp(Widget child) {
   return MaterialApp(title: 'Test Companion Chat', home: child);
