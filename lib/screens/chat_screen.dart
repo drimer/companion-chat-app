@@ -81,7 +81,9 @@ class _ChatScreenState extends State<ChatScreen> {
       return _conversationId!;
     }
 
-    final conversation = await _apiService.createConversation();
+    final conversation = await _retry(
+      () => _apiService.createConversation(),
+    );
     if (!mounted) {
       return conversation.id;
     }
@@ -115,9 +117,11 @@ class _ChatScreenState extends State<ChatScreen> {
       userMessage = Message(role: 'user', content: content);
       _addMessage(userMessage);
       final history = List<Message>.unmodifiable(_messages);
-      final response = await _apiService.sendMessage(
-        conversationId: conversationId,
-        messages: history,
+      final response = await _retry(
+        () => _apiService.sendMessage(
+          conversationId: conversationId,
+          messages: history,
+        ),
       );
       _addMessage(Message(role: 'assistant', content: response.message));
     } catch (error) {
@@ -136,6 +140,26 @@ class _ChatScreenState extends State<ChatScreen> {
         });
       }
     }
+  }
+
+  Future<T> _retry<T>(Future<T> Function() action) async {
+    Object? lastError;
+    StackTrace? lastStack;
+
+    for (var attempt = 0; attempt < 2; attempt++) {
+      try {
+        return await action();
+      } catch (error, stackTrace) {
+        lastError = error;
+        lastStack = stackTrace;
+      }
+    }
+
+    if (lastError != null && lastStack != null) {
+      Error.throwWithStackTrace(lastError, lastStack);
+    }
+
+    throw StateError('Retry attempts exhausted unexpectedly.');
   }
 
   void _showError(String message) {
