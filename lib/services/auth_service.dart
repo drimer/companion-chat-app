@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:openid_client/openid_client.dart';
 
+import '../models/auth_profile.dart';
 import 'auth_config.dart';
 
 const Duration _tokenRefreshTolerance = Duration(seconds: 60);
@@ -160,6 +161,26 @@ class AuthService {
     return tokens;
   }
 
+  Future<AuthProfile?> getCurrentProfile() async {
+    final tokens = await _ensureTokensLoaded();
+    if (tokens == null) {
+      return null;
+    }
+    return parseIdToken(tokens.idToken);
+  }
+
+  AuthProfile? parseIdToken(String? idToken) {
+    if (idToken == null || idToken.isEmpty) {
+      return null;
+    }
+    try {
+      final claims = _decodeJwtPayload(idToken);
+      return AuthProfile.fromClaims(claims);
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<AuthTokens> refreshTokens() async {
     final existing = await _ensureTokensLoaded();
     if (existing == null) {
@@ -237,5 +258,38 @@ class AuthService {
   Future<void> _clearTokens() async {
     await _storage.delete(key: _tokenStorageKey);
     _tokens = null;
+  }
+
+  Map<String, dynamic> _decodeJwtPayload(String token) {
+    final parts = token.split('.');
+    if (parts.length != 3) {
+      throw const FormatException(
+        'Invalid ID token: unexpected number of segments.',
+      );
+    }
+    final normalized = _normalizeBase64(parts[1]);
+    final decoded = base64Url.decode(normalized);
+    final payload = utf8.decode(decoded);
+    final claims = jsonDecode(payload);
+    if (claims is! Map<String, dynamic>) {
+      throw const FormatException('Invalid ID token payload.');
+    }
+    return claims;
+  }
+
+  String _normalizeBase64(String input) {
+    final remainder = input.length % 4;
+    if (remainder == 0) {
+      return input;
+    }
+    if (remainder == 1) {
+      throw const FormatException('Invalid base64url string length.');
+    }
+    final padding = 4 - remainder;
+    final buffer = StringBuffer(input);
+    for (var i = 0; i < padding; i++) {
+      buffer.write('=');
+    }
+    return buffer.toString();
   }
 }
