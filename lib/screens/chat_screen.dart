@@ -33,7 +33,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    _apiService = widget.apiService ?? ApiService();
+    final controller = ref.read(authControllerProvider.notifier);
+    _apiService =
+        widget.apiService ??
+        ApiService(
+          onUnauthorized: () => controller.signOut(revokeTokens: false),
+        );
     _ownsApiService = widget.apiService == null;
     _initialize();
   }
