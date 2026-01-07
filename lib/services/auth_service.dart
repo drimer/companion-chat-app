@@ -138,13 +138,18 @@ class AuthService {
 
     final authUrl = flow.authenticationUri.toString();
 
+    final options = FlutterWebAuth2Options(
+      windowName: 'Companion Chat Login',
+      preferEphemeral: preferEphemeralSession,
+      intentFlags: preferEphemeralSession
+          ? ephemeralIntentFlags
+          : defaultIntentFlags,
+    );
+
     final callbackUrl = await FlutterWebAuth2.authenticate(
       url: authUrl,
       callbackUrlScheme: config.redirectUri.scheme,
-      options: FlutterWebAuth2Options(
-        windowName: 'Companion Chat Login',
-        preferEphemeral: preferEphemeralSession,
-      ),
+      options: options,
     );
 
     final responseUri = Uri.parse(callbackUrl);
@@ -246,6 +251,7 @@ class AuthService {
       }
     }
     await _clearTokens();
+    await _performHostedLogout();
   }
 
   Future<void> _persistTokens(AuthTokens tokens) async {
@@ -291,5 +297,41 @@ class AuthService {
       buffer.write('=');
     }
     return buffer.toString();
+  }
+
+  Future<void> _performHostedLogout() async {
+    final config = AuthConfig.instance;
+    final client = await _ensureClient();
+    final authorizationEndpoint = client.issuer.metadata.authorizationEndpoint;
+    if (authorizationEndpoint == null) {
+      return;
+    }
+
+    final authorizeUri = authorizationEndpoint;
+    final logoutUri = Uri(
+      scheme: authorizeUri.scheme,
+      host: authorizeUri.host,
+      port: authorizeUri.hasPort ? authorizeUri.port : null,
+      path: '/logout',
+      queryParameters: <String, String>{
+        'client_id': config.clientId,
+        'logout_uri': config.redirectUri.toString(),
+      },
+    );
+
+    final options = FlutterWebAuth2Options(
+      windowName: 'Companion Chat Logout',
+      intentFlags: defaultIntentFlags,
+    );
+
+    try {
+      await FlutterWebAuth2.authenticate(
+        url: logoutUri.toString(),
+        callbackUrlScheme: config.redirectUri.scheme,
+        options: options,
+      );
+    } catch (_) {
+      // Ignore logout flow failures; hosted session may persist as a result.
+    }
   }
 }

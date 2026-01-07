@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,6 +11,11 @@ class LoginScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authControllerProvider);
     final controller = ref.read(authControllerProvider.notifier);
+    final preferEphemeralSession =
+        !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+    // Android reuses Chrome custom-tab cookies by default, so request an
+    // ephemeral tab to force a fresh Cognito login. Other platforms ignore
+    // this flag, so scoping it keeps behaviour unchanged elsewhere.
 
     final isLoading = authState.status == AuthStatus.authenticating;
     final hasError =
@@ -60,7 +66,7 @@ class LoginScreen extends ConsumerWidget {
                       onPressed: isLoading
                           ? null
                           : () => controller.signIn(
-                              preferEphemeralSession: false,
+                              preferEphemeralSession: preferEphemeralSession,
                             ),
                       child: isLoading
                           ? const SizedBox(
