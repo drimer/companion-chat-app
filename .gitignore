@@ -35,6 +35,7 @@ migrate_working_dir/
 
 # Local environment config
 env/settings.env
+env/cognito_local_details.md
 
 # Symbolication related
 app.*.symbols
