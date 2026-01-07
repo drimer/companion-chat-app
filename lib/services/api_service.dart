@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -7,6 +8,7 @@ import '../models/chat_response.dart';
 import '../models/conversation.dart';
 import '../models/message.dart';
 import 'api_config.dart';
+import 'auth_service.dart';
 
 class ApiException implements Exception {
   ApiException(
@@ -14,12 +16,14 @@ class ApiException implements Exception {
     this.statusCode,
     this.details,
     this.isOffline = false,
+    this.unauthorized = false,
   });
 
   final String message;
   final int? statusCode;
   final Object? details;
   final bool isOffline;
+  final bool unauthorized;
 
   @override
   String toString() {
@@ -29,15 +33,24 @@ class ApiException implements Exception {
 }
 
 class ApiService {
-  ApiService({http.Client? client}) : _client = client ?? http.Client();
+  ApiService({
+    http.Client? client,
+    AuthService? authService,
+    FutureOr<void> Function()? onUnauthorized,
+  }) : _client = client ?? http.Client(),
+       _authService = authService ?? AuthService.instance,
+       _onUnauthorized = onUnauthorized;
 
   final http.Client _client;
+  final AuthService _authService;
+  final FutureOr<void> Function()? _onUnauthorized;
 
   Future<Conversation> createConversation() async {
     final uri = Uri.parse('${ApiConfig.baseUrl}/conversations');
 
     try {
-      final response = await _client.post(uri);
+      final headers = await _authorizedHeaders();
+      final response = await _client.post(uri, headers: headers);
       _throwForError(response, 'create conversation');
 
       final body = _decodeBody(response.body);
@@ -60,11 +73,10 @@ class ApiService {
     });
 
     try {
-      final response = await _client.post(
-        uri,
-        headers: const {'Content-Type': 'application/json'},
-        body: payload,
-      );
+      final headers = await _authorizedHeaders(const {
+        'Content-Type': 'application/json',
+      });
+      final response = await _client.post(uri, headers: headers, body: payload);
       _throwForError(response, 'send message');
 
       final body = _decodeBody(response.body);
@@ -92,10 +104,16 @@ class ApiService {
       return;
     }
 
+    final unauthorized = status == 401 || status == 403;
+    if (unauthorized) {
+      _handleUnauthorized();
+    }
+
     throw ApiException(
       'Failed to $action. Server responded with $status.',
       statusCode: status,
       details: response.body,
+      unauthorized: unauthorized,
     );
   }
 
@@ -111,5 +129,51 @@ class ApiService {
       );
     }
     return ApiException('Unable to $action: $error', details: error);
+  }
+
+  Future<Map<String, String>> _authorizedHeaders([
+    Map<String, String>? headers,
+  ]) async {
+    try {
+      final token = await _authService.getValidIdToken();
+      if (token == null || token.isEmpty) {
+        throw ApiException(
+          'User session has expired.',
+          statusCode: 401,
+          unauthorized: true,
+        );
+      }
+      return {
+        if (headers != null) ...headers,
+        'Authorization': 'Bearer $token',
+      };
+    } catch (error) {
+      if (error is ApiException && error.unauthorized) {
+        _handleUnauthorized();
+        throw error;
+      }
+      _handleUnauthorized();
+      throw ApiException(
+        'Unable to obtain access token.',
+        statusCode: 401,
+        unauthorized: true,
+        details: error,
+      );
+    }
+  }
+
+  void _handleUnauthorized() {
+    final callback = _onUnauthorized;
+    if (callback == null) {
+      return;
+    }
+    try {
+      final result = callback();
+      if (result is Future<void>) {
+        unawaited(result);
+      }
+    } catch (_) {
+      // Ignore callback failures.
+    }
   }
 }

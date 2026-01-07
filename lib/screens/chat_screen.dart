@@ -1,22 +1,26 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../models/auth_profile.dart';
 import '../models/message.dart';
 import '../services/api_service.dart';
+import '../services/auth_service.dart';
+import '../state/auth_controller.dart';
 import '../widgets/chat_input.dart';
 import '../widgets/message_bubble.dart';
 import '../widgets/typing_indicator.dart';
 
-class ChatScreen extends StatefulWidget {
+class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key, this.apiService});
 
   final ApiService? apiService;
 
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  ConsumerState<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends ConsumerState<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final List<Message> _messages = <Message>[];
   late final ApiService _apiService;
@@ -29,7 +33,12 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    _apiService = widget.apiService ?? ApiService();
+    final controller = ref.read(authControllerProvider.notifier);
+    _apiService =
+        widget.apiService ??
+        ApiService(
+          onUnauthorized: () => controller.signOut(revokeTokens: false),
+        );
     _ownsApiService = widget.apiService == null;
     _initialize();
   }
@@ -205,9 +214,22 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authControllerProvider);
+    final authController = ref.read(authControllerProvider.notifier);
+    final profile = AuthService.instance.parseIdToken(
+      authState.tokens?.idToken,
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Companion Chat'),
+        actions: [
+          IconButton(
+            tooltip: 'Sign out',
+            onPressed: () => unawaited(authController.signOut()),
+            icon: const Icon(Icons.logout),
+          ),
+        ],
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: SafeArea(
@@ -254,6 +276,14 @@ class _ChatScreenState extends State<ChatScreen> {
                     )
                   : const SizedBox.shrink(key: ValueKey('offline-placeholder')),
             ),
+            if (profile != null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+                child: _ProfileBanner(
+                  profile: profile,
+                  onSignOut: () => unawaited(authController.signOut()),
+                ),
+              ),
             Expanded(
               child: _isInitializing && _messages.isEmpty
                   ? const Center(child: CircularProgressIndicator())
@@ -300,5 +330,67 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       ),
     );
+  }
+}
+
+class _ProfileBanner extends StatelessWidget {
+  const _ProfileBanner({required this.profile, required this.onSignOut});
+
+  final AuthProfile profile;
+  final VoidCallback onSignOut;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final initial = _initial(profile.displayName);
+    return Card(
+      elevation: 0,
+      color: theme.colorScheme.surfaceContainerLow,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: theme.colorScheme.primaryContainer,
+              foregroundColor: theme.colorScheme.onPrimaryContainer,
+              child: Text(initial),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(profile.displayName, style: theme.textTheme.bodyLarge),
+                  if (profile.email != null)
+                    Text(profile.email!, style: theme.textTheme.bodySmall),
+                ],
+              ),
+            ),
+            TextButton.icon(
+              onPressed: onSignOut,
+              icon: const Icon(Icons.logout),
+              label: const Text('Sign out'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _initial(String value) {
+    String? pick(String? source) {
+      if (source == null) {
+        return null;
+      }
+      final trimmed = source.trim();
+      if (trimmed.isEmpty) {
+        return null;
+      }
+      final rune = trimmed.runes.first;
+      return String.fromCharCode(rune).toUpperCase();
+    }
+
+    return pick(value) ?? pick(profile.email) ?? pick(profile.subject) ?? '?';
   }
 }

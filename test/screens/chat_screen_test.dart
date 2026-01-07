@@ -1,14 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:companion_chat_app/models/chat_response.dart';
 import 'package:companion_chat_app/models/message.dart';
 import 'package:companion_chat_app/screens/chat_screen.dart';
 import 'package:companion_chat_app/services/api_service.dart';
+import 'package:companion_chat_app/services/auth_service.dart';
+import 'package:companion_chat_app/state/auth_controller.dart';
 import '../mocks/api_service_mock.dart';
 
 Widget _wrapWithApp(Widget child) {
-  return MaterialApp(title: 'Test Companion Chat', home: child);
+  return ProviderScope(
+    overrides: [
+      authControllerProvider.overrideWith((ref) => _TestAuthController()),
+    ],
+    child: MaterialApp(title: 'Test Companion Chat', home: child),
+  );
+}
+
+class _TestAuthController extends AuthController {
+  _TestAuthController() : super(service: AuthService.instance) {
+    state = AuthState.authenticated(
+      AuthTokens(
+        accessToken: 'test-access-token',
+        expiry: DateTime.now().toUtc().add(const Duration(hours: 1)),
+      ),
+    );
+  }
+
+  @override
+  Future<void> restoreSession() async {}
+
+  @override
+  Future<void> signOut({bool revokeTokens = true}) async {}
 }
 
 void main() {
