@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'screens/chat_screen.dart';
-import 'screens/login_screen.dart';
+import 'app_router.dart';
 import 'services/api_config.dart';
 import 'services/auth_config.dart';
-import 'state/auth_controller.dart';
 
 void main() {
   ApiConfig.ensureConfigured();
@@ -18,7 +16,7 @@ class CompanionChatApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authControllerProvider);
+    final router = ref.watch(appRouterProvider);
 
     return MaterialApp(
       title: 'Companion Chat',
@@ -26,11 +24,9 @@ class CompanionChatApp extends ConsumerWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: switch (authState.status) {
-        AuthStatus.authenticated when authState.tokens != null =>
-          const ChatScreen(),
-        _ => const LoginScreen(),
-      },
+      navigatorKey: router.navigatorKey,
+      initialRoute: AppRouter.loginRoute,
+      onGenerateRoute: router.onGenerateRoute,
     );
   }
 }
