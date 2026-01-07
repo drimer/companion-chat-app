@@ -1,8 +1,8 @@
 # Cognito SSO Integration Plan
 
 - [x] Add dependencies in `pubspec.yaml`: include `flutter_web_auth_2`, `openid_client`, `flutter_secure_storage`, and `flutter_riverpod` (or chosen state manager); run `flutter pub get` and adjust Android/iOS/Windows build settings if build errors appear.
-- [ ] Configure platform redirect handling: register redirect URI in Cognito; add `com.linusu.flutter_web_auth_2.CallbackActivity` intent filter in `android/app/src/main/AndroidManifest.xml`; ensure desktop webview requirements are met for Windows/Linux; confirm Cognito allows the chosen scheme.
-- [ ] Create `AuthConfig` class in `lib/services/auth_config.dart` with factory `AuthConfig.fromEnv()` reading issuer/client/redirect/scopes from environment, loaded before `runApp`.
+- [x] Configure platform redirect handling: register redirect URI in Cognito; add `com.linusu.flutter_web_auth_2.CallbackActivity` intent filter in `android/app/src/main/AndroidManifest.xml`; ensure desktop webview requirements are met for Windows/Linux; confirm Cognito allows the chosen scheme.
+- [x] Create `AuthConfig` class in `lib/services/auth_config.dart` with factory `AuthConfig.fromEnv()` reading issuer/client/redirect/scopes from environment, loaded before `runApp`.
 - [ ] Implement `AuthService` in `lib/services/auth_service.dart` with methods `signIn()`, `signOut()`, `refreshTokens()`, and `getValidAccessToken()`, leveraging `flutter_web_auth_2` + `openid_client` and storing tokens via `flutter_secure_storage`.
 - [ ] Add `AuthController` (Riverpod `StateNotifier` or equivalent) in `lib/state/auth_controller.dart` exposing states `AuthState.unauthenticated`, `AuthState.authenticating`, `AuthState.authenticated(tokenSet)`, calling `AuthService` methods.
 - [ ] Introduce `LoginScreen` widget in `lib/screens/login_screen.dart` that listens to `AuthController`, drives `AuthService.signIn()`, and displays errors/status; set it as the initial route in `lib/main.dart`.

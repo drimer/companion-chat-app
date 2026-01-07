@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'services/api_config.dart';
+import 'services/auth_config.dart';
 import 'screens/chat_screen.dart';
 
 void main() {
   ApiConfig.ensureConfigured();
+  AuthConfig.ensureLoaded();
   runApp(const CompanionChatApp());
 }
 
