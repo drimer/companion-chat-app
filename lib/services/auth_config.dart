@@ -5,7 +5,6 @@ class AuthConfig {
     required this.clientId,
     required this.region,
     required this.redirectUri,
-    this.postLogoutRedirectUri,
     required this.scopes,
   });
 
@@ -14,7 +13,6 @@ class AuthConfig {
   final String clientId;
   final String region;
   final Uri redirectUri;
-  final Uri? postLogoutRedirectUri;
   final List<String> scopes;
 
   static AuthConfig? _instance;
@@ -31,9 +29,6 @@ class AuthConfig {
     const clientId = String.fromEnvironment('COGNITO_CLIENT_ID');
     const region = String.fromEnvironment('COGNITO_REGION');
     const redirectUriRaw = String.fromEnvironment('COGNITO_REDIRECT_URI');
-    const logoutRedirectUriRaw = String.fromEnvironment(
-      'COGNITO_LOGOUT_REDIRECT_URI',
-    );
     const scopesRaw = String.fromEnvironment('COGNITO_SCOPES');
 
     if (issuer.isEmpty || clientId.isEmpty || redirectUriRaw.isEmpty) {
@@ -54,16 +49,6 @@ class AuthConfig {
       throw StateError('Invalid COGNITO_REDIRECT_URI: $redirectUriRaw');
     }
 
-    Uri? postLogoutRedirectUri;
-    if (logoutRedirectUriRaw.isNotEmpty) {
-      postLogoutRedirectUri = Uri.tryParse(logoutRedirectUriRaw);
-      if (postLogoutRedirectUri == null) {
-        throw StateError(
-          'Invalid COGNITO_LOGOUT_REDIRECT_URI: $logoutRedirectUriRaw',
-        );
-      }
-    }
-
     final scopes = scopesRaw
         .split(RegExp(r'\s+'))
         .where((scope) => scope.isNotEmpty)
@@ -81,7 +66,6 @@ class AuthConfig {
       clientId: clientId,
       region: region,
       redirectUri: redirectUri,
-      postLogoutRedirectUri: postLogoutRedirectUri,
       scopes: scopes,
     );
   }

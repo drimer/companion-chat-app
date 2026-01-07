@@ -49,9 +49,11 @@ class AuthController extends StateNotifier<AuthState> {
     final completer = Completer<void>();
     _ongoingRestore = completer;
     try {
+      state = const AuthState.authenticating();
       final tokens = await _service.loadPersistedTokens();
       if (tokens != null) {
         state = AuthState.authenticated(tokens);
+        await refreshTokensIfNeeded();
       } else {
         state = const AuthState.unauthenticated();
       }

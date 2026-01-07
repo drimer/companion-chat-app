@@ -5,7 +5,7 @@
 - [x] Create `AuthConfig` class in `lib/services/auth_config.dart` with factory `AuthConfig.fromEnv()` reading issuer/client/redirect/scopes from environment, loaded before `runApp`.
 - [x] Implement `AuthService` in `lib/services/auth_service.dart` with methods `signIn()`, `signOut()`, `refreshTokens()`, and `getValidAccessToken()`, leveraging `flutter_web_auth_2` + `openid_client` and storing tokens via `flutter_secure_storage`.
 - [x] Add `AuthController` (Riverpod `StateNotifier` or equivalent) in `lib/state/auth_controller.dart` exposing states `AuthState.unauthenticated`, `AuthState.authenticating`, `AuthState.authenticated(tokenSet)`, calling `AuthService` methods.
-- [ ] Introduce `LoginScreen` widget in `lib/screens/login_screen.dart` that listens to `AuthController`, drives `AuthService.signIn()`, and displays errors/status; set it as the initial route in `lib/main.dart`.
+- [x] Introduce `LoginScreen` widget in `lib/screens/login_screen.dart` that listens to `AuthController`, drives `AuthService.signIn()`, and displays errors/status; set it as the initial route in `lib/main.dart`.
 - [ ] Wrap protected navigation in `lib/app_router.dart` (or existing navigator) with a guard `AuthRouteGuard` that checks `AuthController` before presenting screens; ensure sign-out clears navigation stack.
 - [ ] Display user profile info in `lib/screens/home_screen.dart` (or equivalent) by decoding ID token via helper `parseIdToken` in `AuthService`; add logout button calling `AuthService.signOut()`.
 - [ ] Integrate API calls: update `lib/services/api_client.dart` (or equivalent) to call `AuthService.getValidAccessToken()` and attach the bearer token to every request; handle 401 by triggering controller sign-out.

@@ -58,7 +58,13 @@ class AuthTokens {
   ) {
     final accessToken = response.accessToken;
     if (accessToken == null || accessToken.isEmpty) {
-      throw StateError('Token response did not contain an access token.');
+      final errorCode = response['error'] as String?;
+      final errorDescription = response['error_description'] as String?;
+      throw StateError(
+        'Token response did not contain an access token.'
+        '${errorCode != null ? ' Error: $errorCode.' : ''}'
+        '${errorDescription != null ? ' Description: $errorDescription.' : ''}',
+      );
     }
 
     final expiry =
@@ -127,6 +133,7 @@ class AuthService {
     final client = await _ensureClient();
 
     final flow = Flow.authorizationCodeWithPKCE(client, scopes: config.scopes);
+    flow.redirectUri = config.redirectUri;
 
     final authUrl = flow.authenticationUri.toString();
 
@@ -140,7 +147,11 @@ class AuthService {
     );
 
     final responseUri = Uri.parse(callbackUrl);
-    final credential = await flow.callback(responseUri.queryParameters);
+    final params = Map<String, String>.from(responseUri.queryParameters);
+    if (responseUri.fragment.isNotEmpty) {
+      params.addAll(Uri.splitQueryString(responseUri.fragment));
+    }
+    final credential = await flow.callback(params);
     final tokenResponse = await credential.getTokenResponse();
     final tokens = AuthTokens.fromTokenResponse(tokenResponse, _clock);
 
