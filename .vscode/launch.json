@@ -11,7 +11,7 @@
             "program": "lib/main.dart",
             "deviceId": "windows",
             "toolArgs": [
-                "--dart-define-from-file=env/settings.env"
+                "--dart-define-from-file=env/windows.settings.env"
             ]
         },
         {
@@ -21,7 +21,7 @@
             "program": "lib/main.dart",
             "deviceId": "R5CW72EXHDH",
             "toolArgs": [
-                "--dart-define-from-file=env/settings.env"
+                "--dart-define-from-file=env/android.settings.env"
             ]
         }
     ]
