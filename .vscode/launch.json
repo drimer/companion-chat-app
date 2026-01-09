@@ -15,6 +15,16 @@
             ]
         },
         {
+            "name": "Flutter MacOS",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "deviceId": "macos",
+            "toolArgs": [
+                "--dart-define-from-file=env/mac.settings.env"
+            ]
+        },
+        {
             "name": "Flutter Android",
             "type": "dart",
             "request": "launch",
