@@ -5,17 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Flutter Windows",
-            "type": "dart",
-            "request": "launch",
-            "program": "lib/main.dart",
-            "deviceId": "windows",
-            "toolArgs": [
-                "--dart-define-from-file=env/windows.settings.env"
-            ]
-        },
-        {
-            "name": "Flutter MacOS",
+            "name": "MacOS App",
             "type": "dart",
             "request": "launch",
             "program": "lib/main.dart",
@@ -25,13 +15,33 @@
             ]
         },
         {
-            "name": "Flutter Android",
+            "name": "Android App (physical)",
             "type": "dart",
             "request": "launch",
             "program": "lib/main.dart",
             "deviceId": "R5CW72EXHDH",
             "toolArgs": [
-                "--dart-define-from-file=env/android.settings.env"
+                "--dart-define-from-file=env/android-phone.settings.env"
+            ]
+        },
+        {
+            "name": "Android App (emulator)",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "emulatorId": "Medium_Phone_API_36.1",
+            "toolArgs": [
+                "--dart-define-from-file=env/android-emulator.settings.env"
+            ]
+        },
+        {
+            "name": "Windows App",
+            "type": "dart",
+            "request": "launch",
+            "program": "lib/main.dart",
+            "deviceId": "windows",
+            "toolArgs": [
+                "--dart-define-from-file=env/windows.settings.env"
             ]
         }
     ]

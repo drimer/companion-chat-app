@@ -48,7 +48,7 @@ class LoginScreen extends ConsumerWidget {
                         ),
                         if (authState.error case final error?) ...[
                           const SizedBox(height: 4),
-                          Text(
+                          SelectableText(
                             error.toString(),
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(
