@@ -14,7 +14,7 @@ class MessageBubble extends StatelessWidget {
         ? Alignment.centerRight
         : Alignment.centerLeft;
     final bubbleColor = isFailedUserMessage
-        ? theme.colorScheme.surfaceVariant
+        ? theme.colorScheme.surfaceContainerHighest
         : message.isUser
         ? theme.colorScheme.primary
         : theme.colorScheme.surfaceContainerHighest;
